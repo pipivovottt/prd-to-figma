@@ -9,6 +9,8 @@ AI 在执行 `prd-to-figma` 时，**必须先读取本文件**：从 PRD 标题�
 | 项目编号 | 项目名称 | 识别关键词 |
 |----------|----------|----------------------------------|
 | P01 | FinEAM | FinEAM、EAM、小九 |
+| P02 | TaaS | TaaS |
+| P03 | 移动端 | 移动端、手机端、APP、H5、移动应用 |
 
 
 ---
@@ -53,6 +55,104 @@ AI 在执行 `prd-to-figma` 时，**必须先读取本文件**：从 PRD 标题�
 ### 设计流程参考文件
 
 `references/fineam-design-ref.md`
+
+---
+
+---
+
+## P02 · TaaS
+
+### 页面框架
+
+```
+左侧固定侧边导航
++ 右侧主区域卡片：
+    内嵌页头区（52px，含导航收起图标 + 带页面标题和路径的面包屑 + 右侧用户信息栏）
+    + 内容区
+```
+
+**补充说明：**
+- 无独立顶部 navbar 组件；导航完全由侧边栏承担，页头是内容卡片内的子区域
+- TaaS 项目目前只支持深色主题
+- 画布尺寸：1920×1080；内容区可用宽度：1624px（1664 - 20×2）
+
+### 组件约束
+
+**优先使用**（本项目中有特定偏好或规范）：
+
+| 组件名 | 适用场景说明 |
+|--------|------------|
+| select（变体：筛选器=true） | 仅用于筛选区，作为筛选器使用 |
+
+### 页面模板
+
+| 模板名称 | 适用场景 |
+|----------|---------|
+| page_template/列表页模板 | 含筛选区 + 数据表格 + 分页的标准列表页 |
+| page_template/表单页模板 | 含表单区块 + 操作按钮的标准表单/详情页 |
+
+### 设计流程参考文件
+
+`references/taas-design-ref.md`
+
+---
+
+## P03 · 移动端
+
+### 页面框架
+
+```
+顶部固定区:
+    Status bar - iPhone (iOS 状态栏,62px)
+    + NavBar 导航栏 (54px,包含返回按钮、标题、操作按钮)
++ 内容滚动区 (可滚动内容区域)
++ 底部固定区:
+    Tabbar 底部标签栏 (60px,可选,用于主导航)
+    + Home Indicator (34px,iOS 底部指示条)
+```
+
+**补充说明:**
+- 移动端页面宽度标准为 375px(iPhone 标准宽度)
+- 页面高度标准为 812px(iPhone X 系列)
+- 触摸区域最小 44px×44px
+- 内容区需避开顶部和底部安全区域
+
+### 组件约束
+
+**页面类型与常用组件:**
+
+| 页面类型 | 常用组件 |
+|----------|---------|
+| 列表页 | NavBar + list + list-items + Tabbar(可选) |
+| 表单页 | NavBar + form-item + bottom(提交按钮) |
+| 详情页 | NavBar + 信息卡片(FundCard/AssetSummaryCard) + ListItem |
+| 首页/Tab 页 | Status bar + top + Segmented control + Tabbar |
+
+**移动端特有组件:**
+
+| 组件名 | 说明 | 使用场景 |
+|--------|------|---------|
+| BottomSheet | 底部弹出层 | 替代 PC 端的居中 Modal,从底部向上滑出 |
+| Tabbar | 底部标签栏 | 移动端主导航方式 |
+| Home Indicator | iOS 底部指示条 | iOS 设备必需 |
+| Status bar | 状态栏 | 显示时间、电量、信号等系统信息 |
+
+**颜色语义规范(金融场景):**
+
+| 场景 | 颜色 | 说明 |
+|------|------|------|
+| 涨幅 | 红色 | 使用 PriceChange Direction=up |
+| 跌幅 | 绿色 | 使用 PriceChange Direction=down |
+| 持平 | 灰色 | 使用 PriceChange Direction=flat |
+| R1-低风险 | 蓝色 | RiskBadge Level=R1 |
+| R2-中低风险 | 浅蓝/绿色 | RiskBadge Level=R2 |
+| R3-中等风险 | 黄色 | RiskBadge Level=R3 |
+| R4-中高风险 | 橙色 | RiskBadge Level=R4 |
+| R5-高风险 | 红色 | RiskBadge Level=R5 |
+
+### 设计流程参考文件
+
+`references/mobile-design-ref.md`
 
 ---
 

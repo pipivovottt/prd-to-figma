@@ -136,4 +136,32 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 **③ 完成后打印进度**
 - 格式：`✓ [N/总数] 页面名称（路由路径）`
 
-所有页面绘制完毕后，汇报：完成数量、Figma 文件链接、任何失败项及原因。
+**④ 设计稿自检（所有页面生成完毕后执行一次）**
+
+对本次生成的所有页面及弹窗，逐条执行以下断言。发现不符项，立即通过 `use_figma` 修正后再继续。
+
+---
+
+**【CHECK-01】弹窗 / 抽屉 body 帧无意外纵向 padding**
+
+**适用场景**：页面中存在通过 `detachInstance()` 重建了 body 内容区的 modal / modal-confirm / Drawer。
+
+**检查方式**：
+```javascript
+// 对每一个 detach 后的弹窗 frame 执行
+const body = modalFrame.findOne(n => n.name === 'body');
+console.log('paddingTop:', body?.paddingTop, 'paddingBottom:', body?.paddingBottom);
+// 期望值：均为 0
+```
+
+**修正方式**：若 `paddingTop` 或 `paddingBottom` 非零且无主动设计意图（即是重建时随手填写的经验值），立即归零：
+```javascript
+body.paddingTop = 0;
+body.paddingBottom = 0;
+```
+
+**根因说明**：modal 的 `body` 容器帧在原组件中纵向 padding 为 0，上下留白由外层 modal frame 的 `itemSpacing` 控制。若在重建时额外添加了 `paddingTop/Bottom`，会与 `itemSpacing` 叠加，产生过大的空白间距。
+
+---
+
+所有页面绘制完毕且自检通过后，汇报：完成数量、Figma 文件链接、任何失败项及原因。

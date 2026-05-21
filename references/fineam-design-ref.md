@@ -176,7 +176,10 @@ inst.resize(220, 1080);
 
 ## 注意事项
 
-1. **不要修改组件字体** - 该库使用 PingFang SC，插件无法加载，修改文字需用户在 Figma 客户端手动完成
+1. **组件字体处理规范** - 该库使用 PingFang SC，插件无法加载
+   - **禁止直接修改**：不要修改组件内文本的 `fontName` 属性
+   - **禁止解绑修改**：不要通过 `detachInstance()` 解绑后修改字体
+   - **正确做法**：参见 `text-style-ref.md` 组件文本流程（流程 1）
 2. **表格组件两套命名**: 
    - `/table-header 表头/` + `/table-cell 单元格/` — 逐行拼装
    - `/table-column 表格列/` — 按列拼装
@@ -198,23 +201,9 @@ inst.resize(220, 1080);
    - `单元格/tag` 外层实例只有 `状态=默认/Hover` 变体，**颜色由内层嵌套的 `tags-wrapper` 实例控制**
    - 切换颜色需对内层 `tags-wrapper` 调用 `swapComponent(targetVariant)`，其中 `targetVariant` 需满足 `颜色=目标色, 大小=迷你, 状态=默认`
    - ⚠️ **`swapComponent` 会清空部分覆写**：若新旧变体的文本节点名称不同，文案覆写无法自动保留。操作后必须立即重新写入文案，避免回退为组件默认值
-   - **文案写入方式（已验证有效）— 字体替换法**：`tags-wrapper` 使用 PingFang SC（plugin 无法加载），且 `setProperties` 对 TEXT 类型组件属性**静默失败**（无报错但值不变）。**唯一可靠方案是先加载 Noto Sans SC，再直接修改文本节点的 fontName 和 characters**：
-     ```javascript
-     await figma.loadFontAsync({ family: 'Noto Sans SC', style: 'Medium' });
-     const rowInst = await figma.getNodeByIdAsync(rowId);
-     const tagCells = rowInst.findAll(n => n.name === '/table-cell 单元格/tag');
-     for (const cell of tagCells) {
-       const textNode = cell.findOne(n => n.name === 'tags-wrapper')?.findOne(n => n.type === 'TEXT');
-       if (textNode) {
-         textNode.fontName = { family: 'Noto Sans SC', style: 'Medium' };
-         textNode.characters = '目标文案';
-       }
-     }
-     ```
-   - ⚠️ **`setProperties({ '替换文本#148903:630': '...' })` 对 TEXT 类型属性静默失败**：VARIANT 和 BOOLEAN 类型属性 setProperties 有效，但 TEXT 类型不生效（测试确认：调用后 `componentProperties` 仍返回原默认值）
-   - ⚠️ Vibma `text.set_content` 对深度嵌套实例的文本节点可能**视觉上无效**（返回 ok 但画布不更新），不推荐用于 tag 文案写入
-   - ⚠️ **不同颜色变体的文本节点 ID 尾部不同**（如 `372:4075`、`372:3883`、`372:4395` 等），不能直接套用固定规律。推荐通过 traversal（`rowInst.findAll(n => n.name === '/table-cell 单元格/tag')`）查找，而非构造 ID
-   - **颜色变体（swapComponent）和文案（字体替换法）必须同步操作**，顺序建议：先 swapComponent 设色，再用字体替换法写文案
+   - **文案写入方式**：参见 `text-style-ref.md` 组件文本流程（流程 1）
+   - ⚠️ **不同颜色变体的文本节点 ID 尾部不同**（如 `372:4075`、`372:3883`、`372:4395` 等），不能直接套用固定规律。需先用 Vibma `node.get_children` 或 `use_figma` 查找文本节点，获取正确的 nodeId
+   - **颜色变体（swapComponent）和文案写入必须同步操作**，顺序：先 swapComponent 设色，再用 Vibma 写文案
 
 5. **涨跌幅颜色规范**（中国金融惯例：涨红跌绿）：
    - 涨幅（正值）文字色：使用颜色变量 `red/red-6`
@@ -231,20 +220,14 @@ inst.resize(220, 1080);
    - Vibma 的 `fontColorVariableName` / `bindings[].variableId` **不支持远程库变量**，必须用 `use_figma` + `importVariableByKeyAsync`
    - **不要使用 `单元格/percent` 展示涨跌幅**，使用 `单元格/text` 并手动绑定对应颜色变量
 
-6. **数值文本样式规范**：
-   页面中展示的数字类数据（如净值、涨跌幅、金额、比率等），需应用 FinEAM 的 **Number** 系列文本样式，而非普通 CN 正文样式。Number 样式使用等宽数字字形，保证列对齐和数据可读性。
-   - 样式命名格式：`正文/{字号}/Number-Regular`，如 `正文/14/Number-Regular`、`正文/12/Number-Regular`
-   - **字号选择原则**：
-     - 若数值位于**组件内部**（如 `单元格/text` 等表格组件），字号跟随组件本身已有的字号，不另行修改
-     - 若数值位于**非组件的独立文本节点**，则根据上下文选择合适字号（如卡片大数字用 20px，正文数据用 14px，辅助说明用 12px）
-   - 通过 Vibma `text.update` 用 `textStyleName` 绑定，例如：`textStyleName: "正文/14/Number-Regular"`
-   - 或通过 `use_figma` 用 `figma.importStyleByKeyAsync` 导入后应用
+6. **数值文本样式规范（Number 样式）**：参见 `text-style-ref.md` 数字字体使用规范。
 
 7. **组件解绑规范**：
    不要随意解绑（detach）组件实例，解绑后将失去与主组件的关联，无法跟随组件库更新同步。
    - **允许解绑**：页面模版（`列表页模版`、`表单页模版` 等）、弹窗（`modal`）——这类组件本身就是搭建骨架用的，解绑后再定制是预期用法
    - **禁止随意解绑**：筛选器（`filter`）、按钮（`Button`）、表格单元格（`单元格/*`）、表头（`表头/*`）、输入框（`input`/`search-box`）等原子/分子级组件，应保持实例状态，通过切换变体或覆写属性（Override）来满足需求
-   - 若需修改组件内部文字，应优先尝试通过实例属性覆写；仅当 API 确实无法写入（如字体加载失败）时，才考虑解绑后修改，并在注释中说明原因
+   - **修改组件文字**：始终通过文本操作（参见 `text-style-ref.md`），不要解绑后修改
+   - **解绑后重建内部容器帧规范**：清空 `body` / `内容区` 等容器帧并切换其 `layoutMode` 时，**不得自行追加 `paddingTop` / `paddingBottom`**。原组件的内容容器帧纵向 padding 设计为 0，上下间距由外层 frame 的 `itemSpacing` 控制。若不确定原始值，先读取再决定：`console.log(body.paddingTop, body.paddingBottom)`；如需保留，显式写出；如需归零，显式 `body.paddingTop = 0; body.paddingBottom = 0`。**禁止凭经验估值。**
 
 8. **本地组件母版必须填充示例数据**：
    创建 `headerRow` 和 `dataRow` 本地组件后，**必须立即向母组件本体填充真实可读的示例数据**，而不是保留占位符（如「单元格」「说明」「状态」「Title」「操作」等默认文案）。
@@ -252,26 +235,7 @@ inst.resize(220, 1080);
    - **dataRow**：所有单元格必须填入一条有代表性的真实样例数据（名称、数值、日期、货币、按钮文案等），tag 类单元格需同时完成颜色 swap 和文案写入
    - **原因**：母组件是设计师调整列宽和布局的直接对象。若保留占位符，设计师无法判断实际内容宽度，易造成列宽设置不合理；且母组件的数据会作为默认值影响后续创建的所有实例的显示效果
 
-   **操作规范**：
-   ```javascript
-   // 填充完母组件结构后，立即用 Vibma set_content 写入所有文本
-   // 示例：headerRow 基金
-   await vibma.text.set_content([
-     { nodeId: 'I{headerCellId};1145:55969', text: '产品名称/ISIN' },
-     // ... 其余列名
-   ]);
-   // dataRow 填充一条代表性数据
-   await vibma.text.set_content([
-     { nodeId: 'I{cell0Id};4559:10194', text: '南方基金未来视野科技基金A' },
-     { nodeId: 'I{cell0Id};4559:10201', text: 'HK0000252101' },
-     // ... 其余字段
-   ]);
-   // tag 单元格：先 swapComponent 设色，再字体替换法写文案
-   tw.swapComponent(grayTag);
-   const t = tw.findOne(n => n.type === 'TEXT');
-   t.fontName = { family: 'Noto Sans SC', style: 'Medium' };
-   t.characters = '股票型';
-   ```
+   **操作规范**：填充完母组件结构后，立即用 `text-style-ref.md` 流程 1（`text.set_content`）写入所有文本。tag 单元格须先通过 `use_figma` 执行 `swapComponent` 设色（参见注意事项 4），再写文案。
 
 9. **页面模版使用限制与退回策略**：
    - 页面模版适用于「整页」场景；若自然语言描述的是**弹窗内的局部布局**（如抽屉、Modal 内的表单），不应套用模版，直接使用原子组件拼装
@@ -350,8 +314,4 @@ inst.resize(220, 1080);
    - 固定定位的悬浮按钮、工具提示
    - 表格行 hover 时浮出的操作按钮组
    普通内容元素一律参与自动布局，不要随意设置绝对定位。
-
-## 完整组件目录
-
-详见 [components-catalog.md](components-catalog.md)
 
