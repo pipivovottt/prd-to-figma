@@ -111,6 +111,42 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 
 ---
 
+## Phase 1 → Phase 2 过渡：Vibma 连接检查
+
+用户确认页面描述后、进入 Phase 2 之前，**必须先完成以下连接检查，通过后再继续**。
+
+### 步骤 A：查询当前连接状态
+
+```typescript
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: { method: "list" })
+```
+
+### 步骤 B：根据返回结果分支处理
+
+| 情况 | 判断依据 | 处理方式 |
+|------|---------|---------|
+| **Figma 插件未连接** | 返回结果中 `figma` 为 `null` 或无插件端条目 | ⛔ **停止执行**，提示用户：「请在 Figma 中打开 Vibma 插件并点击 Connect，连接后告知我，再继续生成。」等用户回复后重新执行步骤 A |
+| **插件已连接、Cursor 未连接** | `figma` 有值但 `mcp` 为 `null` | 自动执行步骤 C，静默连接 |
+| **两端均已连接** | `figma` 与 `mcp` 均有值 | 跳过步骤 C，直接进入 Phase 2 |
+
+### 步骤 C：自动连接 Cursor 侧（仅插件已连接时执行）
+
+```typescript
+// 连接到默认频道
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: {
+  method: "create",
+  channel: "vibma"
+})
+
+// 验证端到端连通性
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: { method: "get" })
+```
+
+- 若 `get` 返回 `{ status: "pong" }` → 连接成功，进入 Phase 2
+- 若返回错误 → 提示用户：「Vibma 连接失败，请检查插件是否保持在连接状态并刷新后重试。」
+
+---
+
 ## Phase 2 — Figma 页面生成
 
 ### 准备工作
@@ -132,6 +168,7 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 **② 按设计参考文件的工作流拼装组件**
 - 遵循设计参考文件中的：页面模版识别 → 组件导入 → 变体选择 → 示例数据填充 → 项目专属规范
 - 不得手动绘制可从组件库找到的元素
+- **写完文字内容后，必须立即执行 Number 字体替换**：对**任意场景**（表格、卡片、详情页、统计区等）中所有显示数字内容的文字节点（百分比、净值、日期、金额、编号、计数等），按 `text-style-ref.md` 流程 1b 调用 `text.update` 应用 Number 系列样式（具体节点场景见各项目设计参考文件工作流步骤 5）。此步骤不可省略，与写内容属于同一原子操作。
 
 **③ 完成后打印进度**
 - 格式：`✓ [N/总数] 页面名称（路由路径）`
