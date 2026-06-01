@@ -50,7 +50,7 @@
 | input | `35c8d59aac43079db9c996c7ecb6ec1098f82e9f` | `大小=中` |
 | search-box | `f7c74d79c13cfbf9555a5d8fa4b2b6e19a3e1dd3` | — |
 | select | `39548a13367e6b8cb157b27828c1bf5964aad923` | — |
-| filter | `8c5f30c5b638c769d89f8748e9f4dcfd0653e9b6` | `Type=Select` |
+| filter | `8c5f30c5b638c769d89f8748e9f4dcfd0653e9b6` | `Type=Select/datepicker` |
 | datepicker | `21cc87a22ac5609e66737bfddad801c11747ce5c` | — |
 | checkbox | `3c82df835f4cad2c7da741d65112a02731d24108` | — |
 | radio | `9b767a208fc9a5fcd8c9eb8f5ffb872993c57187` | — |
