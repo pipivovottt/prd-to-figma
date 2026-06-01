@@ -151,6 +151,7 @@
 |------|-----|------|
 | 列表页模版 | `845cd88185779896021c1a878eb08358d67d0837` | ComponentSet，变体：`项目=星企通` / `项目=支付机构` |
 | 表单页模版 | `8f030a3e7c3525e25e485d70abe2211359b79d75` | ComponentSet，变体：`项目=星企通` / `项目=支付机构` |
+| 详情页模版 | `e7249613519a63fe02eae5a36ad95badab635448` | ComponentSet，变体：`项目=星企通` / `项目=支付机构` |
 | 空白模版 | `93b6d92fb63324baf093d94726da1e3102bac55c` | ComponentSet，变体：`项目=星企通/支付机构, 页面标题=Default/Tab` |
 
 ---
@@ -175,6 +176,7 @@
 |-----------------|------------|
 | page_template/列表页模版 | 导入 `列表页模版` ComponentSet：`845cd88185779896021c1a878eb08358d67d0837` |
 | page_template/表单页模版 | 导入 `表单页模版` ComponentSet：`8f030a3e7c3525e25e485d70abe2211359b79d75` |
+| page_template/详情页模版 | 导入 `详情页模版` ComponentSet：`e7249613519a63fe02eae5a36ad95badab635448` |
 | page_template/空白模版 | 导入 `空白模版` ComponentSet：`93b6d92fb63324baf093d94726da1e3102bac55c` |
 
 命中模版时，按以下流程操作：
@@ -184,6 +186,7 @@
 const templateCS = await figma.importComponentSetByKeyAsync(
   '845cd88185779896021c1a878eb08358d67d0837' // 列表页模版
   // 或 '8f030a3e7c3525e25e485d70abe2211359b79d75' 表单页模版
+  // 或 'e7249613519a63fe02eae5a36ad95badab635448' 详情页模版
   // 或 '93b6d92fb63324baf093d94726da1e3102bac55c' 空白模版
 );
 
