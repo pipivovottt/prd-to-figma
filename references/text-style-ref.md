@@ -219,6 +219,102 @@ text.update([{
 | `运营标题/大-48/Number-Regular` | MiNum Regular | `e91e14123b8c1cd66c1460156443e67dab1b1ac4` |
 | `运营标题/大-48/Number-Medium` | MiNum Medium | `9a28ca40f29a2c0eaa1ab19601b1036eb78cad19` |
 
+### AI 运营-组件库（Finloop）
+
+- **Figma 文件**：https://www.figma.com/design/scodnBKwhh8jBoPorOkf3X/AI-%E8%BF%90%E8%90%A5-%E7%BB%84%E4%BB%B6%E5%BA%93
+- **Library Key**：`lk-42303f5ad3b4a675c8b42dffb4f79ddcbd771302803d07b97f1d99443a204cc74c8a034daf533a45e7ddf612dc98309eb18f18a98a886086ac1eef1ed109fa96`
+- **字体**：中文 PingFang SC / 英文 Arial / 数字 MiNum
+
+#### 辅助文字（12px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `辅助/12/CN-Regular` | PingFang SC Regular | `ff291e37069c9036a1ea55737fa3b9657a0517c5` |
+| `辅助/12/CN-Medium` | PingFang SC Medium | `97404d1b361aadffafbcde667fc2a7b329334edd` |
+| `辅助/12/EN-Regular` | Arial Regular | `11b82efbd0cdf3a8091833fd1a34679ff7820399` |
+| `辅助/12/Number-Regular` | MiNum Regular | `a6399c2ac23f966e7c1efd01cffca754a145855c` |
+| `辅助/12/Number-Medium` | MiNum Medium | `a99423500be3e5c4bc1f6256ae0eec0898546eca` |
+
+#### 正文（14px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `正文/14/CN-Regular` | PingFang SC Regular | `19a4393675a95ac22931315adfaf923bd1ec2e91` |
+| `正文/14/CN-Medium` | PingFang SC Medium | `cbde781870a9fc26b208f684a792c6e6838e8ff7` |
+| `正文/14/EN-Regular` | Arial Regular | `15898196dc9bac981882c062b03420e56b4914d0` |
+| `正文/14/Number-Regular` | MiNum Regular | `c15cab2653a1b6d579e52003872a489e300e3393` |
+| `正文/14/Number-Medium` | MiNum Medium | `518938d747a4b453552abfc2441cdb2399bf2e8b` |
+
+#### 标题/小（16px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `标题/小-16/CN-Regular` | PingFang SC Regular | `fe03b34c4443bfa316a6101b59a87981ed49c183` |
+| `标题/小-16/CN-Medium` | PingFang SC Medium | `855e2624d777ca2ffdacdf8a2df15657d280a974` |
+| `标题/小-16/EN-Regular` | Arial Regular | `3a0bf713d5b71b37aeb960ce4261d886c11a6270` |
+| `标题/小-16/Number-Regular` | MiNum Regular | `eaaee5255f232503fa1fbd726a7686ce0ec8a790` |
+| `标题/小-16/Number-Medium` | MiNum Medium | `f59f14a916860a5b2e50d9233fe7d76774350f91` |
+
+#### 标题/中（18px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `标题/中-18/CN-Regular` | PingFang SC Regular | `d3c501385a69051942adcdbccf0dfcac2ab33624` |
+| `标题/中-18/CN-Medium` | PingFang SC Medium | `5c4e5c02e379153cd52a00b55465d5304f179652` |
+| `标题/中-18/EN-Regular` | Arial Regular | `e74cd18624ae1f3a5b767e91294311f8cb7cc40c` |
+| `标题/中-18/Number-Regular` | MiNum Regular | `5aa4caf4dbbb374d92c29360825388f8ec9fa34b` |
+| `标题/中-18/Number-Medium` | MiNum Medium | `a66b516e58d370547a5d901a36346101bc95253a` |
+
+#### 标题/大（20px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `标题/大-20/CN-Regular` | PingFang SC Regular | `5844453c5e14cdfeafe57cbdf400d007d895d8d8` |
+| `标题/大-20/CN-Medium` | PingFang SC Medium | `f04e2dd20b6045da73ee57ac2446aaf3b7113317` |
+| `标题/大-20/EN-Regular` | Arial Regular | `50fa64ede7157de0c4f3883def0c4aa78def58ba` |
+| `标题/大-20/Number-Regular` | MiNum Regular | `88cb7ea31cfdf02f198bd05ff5f383ca5265ac5d` |
+| `标题/大-20/Number-Medium` | MiNum Medium | `c491d627b4eb9f978e449e5ea572fdb1aa6a25ad` |
+
+#### 标题/大（24px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `标题/大-24/CN-Regular` | PingFang SC Regular | `2a37f2088361f7875fffa8886ea6054e92f4d844` |
+| `标题/大-24/CN-Medium` | PingFang SC Medium | `055de55d64ae8823d607823bbb588b7e8fe03838` |
+| `标题/大-24/EN-Regular` | Arial Regular | `f8e13cd40cac4715a41bf4ad64523f8910b1078b` |
+| `标题/大-24/Number-Regular` | MiNum Regular | `575743b932b5e9788686139603fa82134bdae4d8` |
+| `标题/大-24/Number-Medium` | MiNum Medium | `3a0925520085b8ff6cac9dd82bc4323d864ac8bc` |
+
+#### 运营标题/小（32px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `运营标题/小-32/CN-Regular` | PingFang SC Regular | `23cb3d478bb4c02bbc2446d2c4c9eba6ac271044` |
+| `运营标题/小-32/CN-Medium` | PingFang SC Medium | `279abee71379971f614f7b33cc448d9f496f44ef` |
+| `运营标题/小-32/EN-Regular` | Arial Regular | `84a1c1a99d99322b400d00bf4d52c3c3bdc3873f` |
+| `运营标题/小-32/Number-Regular` | MiNum Regular | `4e6a05d51cb6862d6f75c14c79086b66152bb486` |
+| `运营标题/小-32/Number-Medium` | MiNum Medium | `2af990a599708d33dea657338c9dbb60af563d4c` |
+
+#### 运营标题/中（36px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `运营标题/中-36/CN-Regular` | PingFang SC Regular | `62ef22de3e1c5c47a4c2e79ed018c1da81f4140a` |
+| `运营标题/中-36/CN-Medium` | PingFang SC Medium | `9b1f700b0e3bd3208ac18269d176a1165ac7f3f5` |
+| `运营标题/中-36/EN-Regular` | Arial Regular | `a4d493b9c329fb8b1daaa2609a18e08f0080f58c` |
+| `运营标题/中-36/Number-Regular` | MiNum Regular | `c6f0d28136229b35090b245cb6aabd90be05b486` |
+| `运营标题/中-36/Number-Medium` | MiNum Medium | `3ea7c4919928d5bb231294cf4d0a0c6d5b17bae3` |
+
+#### 运营标题/大（48px）
+
+| 样式名 | 字体 | Key |
+|--------|------|-----|
+| `运营标题/大-48/CN-Regular` | PingFang SC Regular | `03cdf5684269a46f8c213fd9f726da6669d0f2f5` |
+| `运营标题/大-48/CN-Medium` | PingFang SC Medium | `f9eb46aeaaa2d4bf0e9bc29e96e31f673cb4828c` |
+| `运营标题/大-48/EN-Regular` | Arial Regular | `d3b3c636724d9f1a7c4668ed6aaed3e5ccb7de4d` |
+| `运营标题/大-48/Number-Regular` | MiNum Regular | `bad0ccae727dfe6a02954b431a69d1c2dda6e932` |
+| `运营标题/大-48/Number-Medium` | MiNum Medium | `a8e03473716cb96b40c15cae33d0d2bafaab907f` |
+
 ---
 
 ## 移动端组件库
@@ -323,14 +419,14 @@ text.update([{
 
 | 端 | 样式前缀 | 字号示例 |
 |----|---------|---------|
-| Web（FinEAM） | `辅助/12/Number-*`、`正文/14/Number-*`、`标题/小-16/Number-*` 等 | 见上方 Web 端组件库表格 |
+| Web（FinEAM / Finloop） | `辅助/12/Number-*`、`正文/14/Number-*`、`标题/小-16/Number-*` 等 | 见上方 Web 端组件库表格 |
 | 移动端 | `text/number/body/*`、`text/number/caption/*`、`text/number/heading/*` 等 | 见上方移动端组件库表格 |
 
 ---
 
 ## 快速选样式指南
 
-### Web 端（FinEAM）
+### Web 端（FinEAM / Finloop）
 
 | 场景 | 推荐样式 |
 |------|---------|
