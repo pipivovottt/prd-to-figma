@@ -3,7 +3,7 @@
 ## 前提：必须先读取 figma-use skill
 
 - **组件库文件 key**: `JknFO7OVAVAnWrkCjAFZg1`
-- **导入方式**: `figma.importComponentSetByKeyAsync(componentKey)`（有变体的组件集）或 `figma.importComponentByKeyAsync(componentKey)`（单一组件，如页面模板）
+- **导入方式**: `figma.importComponentSetByKeyAsync(componentKey)`
 - 需在目标文件的 `use_figma` 中指定目标文件的 `fileKey`，组件通过 key 从远程库导入
 
 
@@ -141,12 +141,15 @@ const pageFrame = templateInst.detachInstance();
 // ④ 找到内容区（根据实际模板内的节点名称调整）
 const contentArea = pageFrame.findOne(n => n.name === '内容区');
 
-// ⑤ 清空内容区，准备填入实际业务组件
-[...contentArea.children].forEach(c => c.remove());
+// ⑤ 清空内容区各容器 frame 内的占位内容，保留内容区原本骨架
+// 先 dump 内容区内部树结构，确认主卡片、页面标题行、筛选区、表格区、分页区等 frame 仍在
+// 只在各容器 frame 内删除占位组件/文字，再填入实际业务组件
+// ⛔ 禁止 [...contentArea.children].forEach(c => c.remove()) 删掉整个内容区子树后按 HTML 原型重新搭建
 ```
 
 **注意事项**：
 - 模板解绑后已包含导航框架，**不再单独导入这些框架组件**
+- 内容区内部已有固定嵌套（主卡片 → 页面标题行 / 筛选区 / 表格区 / 分页区），**保留这些 frame，只替换其中的组件与文案**
 - 若描述中未命中模板关键词，退回逐组件拼装方式
 - 模板仅适用于整页场景；弹窗、抽屉等局部布局直接用原子组件拼装
 
@@ -178,9 +181,9 @@ inst.y = 0;
 
 ### 3. 标准列宽参考
 
-- 名称列（主列）: `<!-- TODO: 如 240–360px -->`
-- 数据列: `<!-- TODO: 如 120–200px -->`
-- 操作列: `<!-- TODO: 如 160–280px，按按钮数量调整 -->`
+- 名称列（主列）: 350–480px
+- 数据列: 160–220px
+- 操作列: 200–350px（按按钮数量调整）
 
 ### 4. 优先使用已有组件
 
@@ -281,6 +284,15 @@ inst.y = 0;
 
    **工作流**：
    ```javascript
+   // 0. 准备表格容器（tableSlot）
+   //    ⚠️ tableSlot 不是新建 frame，而是在 contentArea 内创建的透明包装层
+   //    必须在 contentArea 已清空的前提下执行
+   const tableSlot = figma.createAutoLayout('VERTICAL', { name: 'tableSlot', itemSpacing: 0 });
+   tableSlot.fills = [];  // ← 必须清空默认白色填充！否则会在深色背景上盖一层大白块
+   contentArea.insertChild(0, tableSlot);   // 插到 pagination 之前
+   tableSlot.layoutSizingHorizontal = 'FILL';
+   tableSlot.layoutSizingVertical = 'HUG';
+
    // 1. 先构建单行结构，挂到页面根节点临时放置
    const rowComp = figma.createComponent();
    rowComp.name = 'dataRow';
@@ -288,7 +300,8 @@ inst.y = 0;
    rowComp.primaryAxisSizingMode = 'AUTO'; // 宽度跟随内容，不要 resize 为固定值
    figma.currentPage.appendChild(rowComp);
    // ... 向 rowComp 内添加各列单元格实例 ...
-   // 2. 实例化 N 次放入表格容器
+
+   // 2. 实例化 N 次放入 tableSlot
    for (let i = 0; i < 8; i++) {
      const inst = rowComp.createInstance();
      tableSlot.appendChild(inst);
@@ -327,7 +340,7 @@ inst.y = 0;
    ```
 
 10. **组件宽度设置规范**
-   大多数 FinEAM 原子/分子组件（`filter`、`search-box`、`Button`、`input`、`datepicker` 等）**不需要手动 resize 宽度**，直接保持组件默认的 AUTO/HUG 自适应行为即可。若实例化后被意外 resize 为 FIXED，应通过 `use_figma` 恢复：
+   大多数 TaaS 原子/分子组件（`filter`、`search-box`、`Button`、`input`、`datepicker` 等）**不需要手动 resize 宽度**，直接保持组件默认的 AUTO/HUG 自适应行为即可。若实例化后被意外 resize 为 FIXED，应通过 `use_figma` 恢复：
    ```javascript
    inst.layoutSizingHorizontal = 'HUG'; // 恢复自适应
    ```

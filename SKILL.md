@@ -1,6 +1,6 @@
 ---
 name: prd-to-figma
-description: 将产品需求文档（PRD）分析为结构化页面描述，经用户确认后调用项目设计系统在 Figma 中逐页生成设计稿。用户提供 PRD 后自动运行整条流水线；支持多项目路由（当前支持 FinEAM），可通过 references/projects-info.md 扩展新项目。
+description: 将产品需求文档（PRD）分析为结构化页面描述，经用户确认后调用项目设计系统在 Figma 中逐页生成设计稿。用户提供 PRD 后自动运行整条流水线；支持多项目路由，可通过 references/projects-info.md 扩展新项目。
 ---
 
 # PRD → Figma 设计稿生成流水线
@@ -111,6 +111,42 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 
 ---
 
+## Phase 1 → Phase 2 过渡：Vibma 连接检查
+
+用户确认页面描述后、进入 Phase 2 之前，**必须先完成以下连接检查，通过后再继续**。
+
+### 步骤 A：查询当前连接状态
+
+```typescript
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: { method: "list" })
+```
+
+### 步骤 B：根据返回结果分支处理
+
+| 情况 | 判断依据 | 处理方式 |
+|------|---------|---------|
+| **Figma 插件未连接** | 返回结果中 `figma` 为 `null` 或无插件端条目 | ⛔ **停止执行**，提示用户：「请在 Figma 中打开 Vibma 插件并点击 Connect，连接后告知我，再继续生成。」等用户回复后重新执行步骤 A |
+| **插件已连接、Cursor 未连接** | `figma` 有值但 `mcp` 为 `null` | 自动执行步骤 C，静默连接 |
+| **两端均已连接** | `figma` 与 `mcp` 均有值 | 跳过步骤 C，直接进入 Phase 2 |
+
+### 步骤 C：自动连接 Cursor 侧（仅插件已连接时执行）
+
+```typescript
+// 连接到默认频道
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: {
+  method: "create",
+  channel: "vibma"
+})
+
+// 验证端到端连通性
+CallMcpTool(server: "user-Vibma", toolName: "connection", arguments: { method: "get" })
+```
+
+- 若 `get` 返回 `{ status: "pong" }` → 连接成功，进入 Phase 2
+- 若返回错误 → 提示用户：「Vibma 连接失败，请检查插件是否保持在连接状态并刷新后重试。」
+
+---
+
 ## Phase 2 — Figma 页面生成
 
 ### 准备工作
@@ -118,7 +154,7 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 1. 从用户提供的 Figma URL 解析 `fileKey`（`figma.com/design/:fileKey/...`）
 2. 重新读取 `references/projects-info.md`，获取当前项目的「设计参考文件」路径
 3. 读取该设计参考文件（含组件 key 速查表 + 项目专属规范）
-4. 读取 `/Users/xindih/.cursor/plugins/cache/cursor-public/figma/3590366424deba5651026319b71b291d10004f1b/skills/figma-use/SKILL.md`（**必须在任何 `use_figma` 调用前完成**）
+4. 读取 `SKILL.md`（**必须在任何 `use_figma` 调用前完成**）
 
 ### 逐页绘制
 
@@ -130,38 +166,26 @@ Tag / Badge / Button / TextButton / Input / Select / Table / DataTable / Card / 
 - 多个 Frame 水平排列，间距 80px
 
 **② 按设计参考文件的工作流拼装组件**
-- 遵循设计参考文件中的：页面模版识别 → 组件导入 → 变体选择 → 示例数据填充 → 项目专属规范
+
+**页面模版使用规则（命中 `page_template/*` 时强制执行）**
+
+1. **模版骨架是唯一布局来源**：内容区的层级、分区、间距必须以设计参考文件中页面模版的内部结构为准；**不得**参照 PRD 附带的 HTML 交互原型、截图或 Phase 1 文字描述自行发明布局骨架。
+2. **保留内容区骨架，只清内部内容**：导入并解绑模版后，须先检查内容区内部树结构（节点名称、layoutMode、padding、itemSpacing），确认主卡片、页面标题行、筛选区、表格区、分页区等 frame 仍在，**只清空各容器 frame 内的占位内容，再填入业务组件**。
+   - ⛔ 禁止：`[...contentArea.children].forEach(c => c.remove())` 删掉整个内容区子树，再新建 `筛选区` / `表格区` / `分页区` 等 frame
+   - ⛔ 禁止：给内容区或各分区随意追加 padding、白底卡片、圆角——这些应由模版内已有容器提供
+3. **绘制前必做模版对照**：向目标内容区填入任何业务组件之前，临时导入一份同类型模版实例，dump 并截图其内容区结构，作为本次生成的结构基准。
+4. **PRD / HTML 原型的用途限定**：仅用于提取业务字段、枚举值、交互状态与文案；**不得**作为 Figma 节点层级、筛选行数、分区间距的参考。若原型布局与模版结构冲突（如原型两行筛选、模版单行），以模版为准，必要时在生成前向用户说明差异。
+5. **在模版容器内替换组件**：在模版已有的标题行、筛选区、表格区、分页区 frame 内导入筛选器、表格行、分页等组件并填充数据；保留模版规定的「内容区 → 主卡片 → 标题 / 筛选 / 表格 / 分页」嵌套关系。
+
+- 遵循设计参考文件中的：页面模版识别 → **模版结构对照** → 组件导入 → 变体选择 → 示例数据填充 → 项目专属规范
 - 不得手动绘制可从组件库找到的元素
+- **写完文字内容后，必须立即执行 Number 字体替换**：对**任意场景**（表格、卡片、详情页、统计区等）中所有显示数字内容的文字节点（百分比、净值、日期、金额、编号、计数等），按 `text-style-ref.md` 流程 1b 调用 `text.update` 应用 Number 系列样式（具体节点场景见各项目设计参考文件工作流步骤 5）。此步骤不可省略，与写内容属于同一原子操作。
 
 **③ 完成后打印进度**
 - 格式：`✓ [N/总数] 页面名称（路由路径）`
 
 **④ 设计稿自检（所有页面生成完毕后执行一次）**
 
-对本次生成的所有页面及弹窗，逐条执行以下断言。发现不符项，立即通过 `use_figma` 修正后再继续。
-
----
-
-**【CHECK-01】弹窗 / 抽屉 body 帧无意外纵向 padding**
-
-**适用场景**：页面中存在通过 `detachInstance()` 重建了 body 内容区的 modal / modal-confirm / Drawer。
-
-**检查方式**：
-```javascript
-// 对每一个 detach 后的弹窗 frame 执行
-const body = modalFrame.findOne(n => n.name === 'body');
-console.log('paddingTop:', body?.paddingTop, 'paddingBottom:', body?.paddingBottom);
-// 期望值：均为 0
-```
-
-**修正方式**：若 `paddingTop` 或 `paddingBottom` 非零且无主动设计意图（即是重建时随手填写的经验值），立即归零：
-```javascript
-body.paddingTop = 0;
-body.paddingBottom = 0;
-```
-
-**根因说明**：modal 的 `body` 容器帧在原组件中纵向 padding 为 0，上下留白由外层 modal frame 的 `itemSpacing` 控制。若在重建时额外添加了 `paddingTop/Bottom`，会与 `itemSpacing` 叠加，产生过大的空白间距。
-
----
+读取 `references/design-check.md`，对本次生成的所有页面及弹窗，逐条执行文件中的自检项。发现不符项，立即通过 `use_figma` 修正后再继续。
 
 所有页面绘制完毕且自检通过后，汇报：完成数量、Figma 文件链接、任何失败项及原因。
